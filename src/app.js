@@ -342,64 +342,6 @@
     commitTreeChange(hit.container, 0);
   }
 
-  function addSiblingNode() {
-    const hit = requireSelection();
-    if (!hit || !hit.parent) {
-      return;
-    }
-
-    const text = prompt('输入同级节点内容：', '新节点');
-    if (!text || !text.trim()) {
-      return;
-    }
-
-    const siblings = hit.parent.children;
-    const index = siblings.indexOf(hit.node);
-    if (index < 0) {
-      return;
-    }
-
-    if (hit.parent.virtual) {
-      const node = {
-        id: nextNodeId++,
-        text: text.trim(),
-        depth: hit.node.depth,
-        children: [],
-        collapsed: false,
-        side: null
-      };
-      siblings.splice(index + 1, 0, node);
-      selectedNodeId = node.id;
-      commitTreeChange(hit.container, 0);
-      return;
-    }
-
-    const targetSide = hit.node.side === 'left' ? 'right' : 'left';
-    if (!targetSide) {
-      alert('当前节点未定义左右属性，无法新增同级。请先通过左右子节点按钮新增。');
-      return;
-    }
-
-    if (getChildBySide(hit.parent, targetSide)) {
-      alert(`父节点的${targetSide === 'left' ? '左' : '右'}子节点已存在，无法新增同级。`);
-      return;
-    }
-
-    const node = {
-      id: nextNodeId++,
-      text: text.trim(),
-      depth: hit.node.depth,
-      children: [],
-      collapsed: false,
-      side: targetSide
-    };
-
-    siblings.push(node);
-    sortChildrenBySide(hit.parent);
-    selectedNodeId = node.id;
-    commitTreeChange(hit.container, 0);
-  }
-
   function editNode() {
     const hit = requireSelection();
     if (!hit) {
@@ -453,7 +395,6 @@
   $('addRightChildBtn').addEventListener('click', function () {
     addChildNode('right');
   });
-  $('addSiblingBtn').addEventListener('click', addSiblingNode);
   $('editNodeBtn').addEventListener('click', editNode);
   $('deleteNodeBtn').addEventListener('click', deleteNode);
 
