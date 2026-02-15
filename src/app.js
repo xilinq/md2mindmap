@@ -24,6 +24,17 @@
   let nextNodeId = 1;
   let nodeCount = 0;
 
+  const modifiedSync = {
+    sourceFileName: null,
+    targetFileName: null,
+    fileHandle: null,
+    eol: '\n',
+    enabled: false,
+    lastContent: null,
+    writeChain: Promise.resolve(),
+    writeErrorShown: false
+  };
+
   function traverseAll(node, fn) {
     if (!node) {
       return;
@@ -252,8 +263,84 @@
 
   const viewport = createViewportController(svgEl, viewportEl, updateStatus);
 
+  function detectEol(text) {
+    return text.includes('\r\n') ? '\r\n' : '\n';
+  }
+
+  function normalizeEol(text, eol) {
+    const lf = (text || '').replace(/\r\n/g, '\n');
+    return eol === '\r\n' ? lf.replace(/\n/g, '\r\n') : lf;
+  }
+
+  function buildModifiedFileName(fileName) {
+    const name = fileName || 'mindmap.md';
+    const dot = name.lastIndexOf('.');
+    if (dot > 0) {
+      return `${name.slice(0, dot)}.modified${name.slice(dot)}`;
+    }
+    return `${name}.modified`;
+  }
+
+  async function initModifiedFileSync(sourceFileName, sourceText) {
+    modifiedSync.sourceFileName = sourceFileName || 'mindmap.md';
+    modifiedSync.targetFileName = buildModifiedFileName(modifiedSync.sourceFileName);
+    modifiedSync.eol = detectEol(sourceText || '');
+    modifiedSync.fileHandle = null;
+    modifiedSync.enabled = false;
+    modifiedSync.lastContent = null;
+    modifiedSync.writeErrorShown = false;
+
+    if (typeof window.showSaveFilePicker !== 'function') {
+      alert('当前浏览器不支持直接写入本地文件。请使用 Chromium 内核浏览器以启用 .modified 实时同步。');
+      return;
+    }
+
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: modifiedSync.targetFileName,
+        types: [{
+          description: 'Markdown',
+          accept: {
+            'text/markdown': ['.md', '.markdown', '.txt']
+          }
+        }]
+      });
+
+      modifiedSync.fileHandle = handle;
+      modifiedSync.enabled = true;
+      queueModifiedWrite(mdEl.value || sourceText || '', true);
+    } catch {
+      alert('未选择 .modified 输出文件，已跳过实时同步。');
+    }
+  }
+
+  function queueModifiedWrite(content, force) {
+    if (!modifiedSync.enabled || !modifiedSync.fileHandle) {
+      return;
+    }
+
+    const normalized = normalizeEol(content || '', modifiedSync.eol);
+    if (!force && modifiedSync.lastContent === normalized) {
+      return;
+    }
+
+    modifiedSync.lastContent = normalized;
+    modifiedSync.writeChain = modifiedSync.writeChain.then(async function () {
+      const writer = await modifiedSync.fileHandle.createWritable();
+      await writer.write(normalized);
+      await writer.close();
+    }).catch(function () {
+      modifiedSync.enabled = false;
+      if (!modifiedSync.writeErrorShown) {
+        modifiedSync.writeErrorShown = true;
+        alert('写入 .modified 文件失败，已停止实时同步。');
+      }
+    });
+  }
+
   function syncMarkdownFromTree() {
     mdEl.value = serializeTreeToMarkdown(currentRoot);
+    queueModifiedWrite(mdEl.value, false);
   }
 
   function commitTreeChange(container, droppedCount) {
@@ -285,6 +372,8 @@
     refreshNodeCount();
     redrawCurrent();
 
+    queueModifiedWrite(mdEl.value || '', false);
+
     const totalDropped = overflowDropped + enforcedDropped;
     if (totalDropped > 0) {
       alert(`已按二叉规则读取思维导图，并丢弃 ${totalDropped} 个超额节点。`);
@@ -292,9 +381,18 @@
     }
   }
 
-  function setMarkdownAndRender(markdown) {
-    mdEl.value = markdown;
+  function setMarkdownAndRender(payload) {
+    if (typeof payload === 'string') {
+      mdEl.value = payload;
+      doRender();
+      return;
+    }
+
+    const text = payload?.text || '';
+    const fileName = payload?.fileName || 'mindmap.md';
+    mdEl.value = text;
     doRender();
+    initModifiedFileSync(fileName, text);
   }
 
   function requireSelection() {
@@ -406,6 +504,7 @@
     refreshNodeCount();
     clearMindmap(viewportEl);
     viewport.resetView();
+    queueModifiedWrite('', true);
     updateStatus();
   });
 

@@ -37,7 +37,10 @@
       }
 
       const text = await mdFile.text();
-      onMarkdown(text);
+      onMarkdown({
+        text,
+        fileName: mdFile.name || 'mindmap.md'
+      });
     }
 
     window.addEventListener('dragenter', (event) => {
