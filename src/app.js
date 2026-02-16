@@ -35,6 +35,60 @@
     writeErrorShown: false
   };
 
+  const history = {
+    undo: [],
+    redo: [],
+    current: '',
+    max: 300,
+    applying: false
+  };
+
+  function isEditableTarget(target) {
+    if (!target) {
+      return false;
+    }
+    if (target === mdEl) {
+      return true;
+    }
+    const tag = String(target.tagName || '').toUpperCase();
+    return tag === 'INPUT' || tag === 'TEXTAREA' || !!target.isContentEditable;
+  }
+
+  function updateHistoryButtons() {
+    const undoBtn = $('undoBtn');
+    const redoBtn = $('redoBtn');
+    if (undoBtn) {
+      undoBtn.disabled = history.undo.length === 0;
+    }
+    if (redoBtn) {
+      redoBtn.disabled = history.redo.length === 0;
+    }
+  }
+
+  function initHistory(initialText) {
+    history.undo = [];
+    history.redo = [];
+    history.current = initialText || '';
+    updateHistoryButtons();
+  }
+
+  function pushHistorySnapshot(nextText) {
+    if (history.applying) {
+      return;
+    }
+    const normalized = nextText || '';
+    if (normalized === history.current) {
+      return;
+    }
+    history.undo.push(history.current);
+    if (history.undo.length > history.max) {
+      history.undo.shift();
+    }
+    history.current = normalized;
+    history.redo = [];
+    updateHistoryButtons();
+  }
+
   function traverseAll(node, fn) {
     if (!node) {
       return;
@@ -356,9 +410,12 @@
     if (totalDropped > 0) {
       alert(`已按二叉规则纠正并丢弃 ${totalDropped} 个超额节点。`);
     }
+
+    pushHistorySnapshot(mdEl.value || '');
   }
 
-  function doRender() {
+  function doRender(options) {
+    const opts = options || {};
     currentRoot = parseMd(mdEl.value || '');
     selectedNodeId = null;
 
@@ -379,6 +436,39 @@
       alert(`已按二叉规则读取思维导图，并丢弃 ${totalDropped} 个超额节点。`);
       syncMarkdownFromTree();
     }
+
+    if (!opts.skipHistory) {
+      pushHistorySnapshot(mdEl.value || '');
+    }
+  }
+
+  function applyHistorySnapshot(snapshot) {
+    history.applying = true;
+    mdEl.value = snapshot || '';
+    doRender({ skipHistory: true });
+    history.applying = false;
+  }
+
+  function undoOneStep() {
+    if (history.undo.length === 0) {
+      return;
+    }
+    const previous = history.undo.pop();
+    history.redo.push(history.current);
+    history.current = previous;
+    applyHistorySnapshot(previous);
+    updateHistoryButtons();
+  }
+
+  function redoOneStep() {
+    if (history.redo.length === 0) {
+      return;
+    }
+    const next = history.redo.pop();
+    history.undo.push(history.current);
+    history.current = next;
+    applyHistorySnapshot(next);
+    updateHistoryButtons();
   }
 
   function setMarkdownAndRender(payload) {
@@ -477,7 +567,11 @@
     commitTreeChange(hit.container, 0);
   }
 
-  $('renderBtn').addEventListener('click', doRender);
+  $('renderBtn').addEventListener('click', function () {
+    doRender();
+  });
+  $('undoBtn').addEventListener('click', undoOneStep);
+  $('redoBtn').addEventListener('click', redoOneStep);
   $('resetViewBtn').addEventListener('click', function () {
     viewport.resetView();
   });
@@ -506,6 +600,7 @@
     viewport.resetView();
     queueModifiedWrite('', true);
     updateStatus();
+    pushHistorySnapshot('');
   });
 
   $('exampleBtn').addEventListener('click', function () {
@@ -519,6 +614,27 @@
     }
   });
 
+  window.addEventListener('keydown', function (event) {
+    if (!event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) {
+      return;
+    }
+    if (isEditableTarget(event.target)) {
+      return;
+    }
+
+    const key = String(event.key || '').toLowerCase();
+    if (key === 'z') {
+      event.preventDefault();
+      undoOneStep();
+      return;
+    }
+
+    if (key === 'y') {
+      event.preventDefault();
+      redoOneStep();
+    }
+  });
+
   setupMarkdownDrop({
     app: appEl,
     dropZone: dropZoneEl,
@@ -526,7 +642,9 @@
   });
 
   $('exampleBtn').click();
-  doRender();
+  doRender({ skipHistory: true });
+  initHistory(mdEl.value || '');
   viewport.resetView();
   updateStatus();
 })();
+

@@ -20,12 +20,14 @@
       <button id="clearBtn">清空</button>
     </div>
     <div class="tip">
-      操作：点击节点选中、点击角标折叠/展开、滚轮缩放、拖拽平移、<span class="kbd">R</span> 重置视图
+      操作：点击节点选中、点击角标折叠/展开、滚轮缩放、拖拽平移、<span class="kbd">Ctrl+Z</span> 撤回、<span class="kbd">Ctrl+Y</span> 前进、<span class="kbd">R</span> 重置视图
     </div>
   </div>
 
   <div class="right">
     <div class="topRight">
+      <button id="undoBtn">撤回</button>
+      <button id="redoBtn">前进</button>
       <button id="resetViewBtn">重置视图</button>
       <button id="exportBtn">导出 SVG</button>
       <button id="exportMdBtn">导出 MD</button>
@@ -53,3 +55,4 @@
 <script src="src/app.js"></script>
 </body>
 </html>
+
