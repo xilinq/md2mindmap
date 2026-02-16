@@ -19,15 +19,15 @@
 
   window.Mindmap.FONT = '15.5px ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans CJK SC", "PingFang SC", "Microsoft YaHei", Arial';
 
-  window.Mindmap.EXAMPLE_MD = `## 王亚基A17168908
+  window.Mindmap.EXAMPLE_MD = `## 示例根节点
 
-### 金文忠C17224571
-- 宋燕C17455260
-\t- 赵小卫B17478783
-\t\t- 王见C17511419
+### 示例分支一
+- 示例成员
+\t- 示例成员
+\t\t- 示例成员
 
-### 吴莉c17446413
-- 张益玲D17446423
-\t- 张小梅E17446471
-\t\t- 王艳C17528855`;
+### 示例分支二
+- 示例成员
+\t- 示例成员
+\t\t- 示例成员`;
 })();
