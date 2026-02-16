@@ -2,7 +2,7 @@
 
 一个无需任何依赖的 Markdown 思维导图工具。
 
-- 直接双击 `mindmap.html` 即可运行（支持 `file://`）
+- 直接双击 `index.html`（或 `mindmap.html`）即可运行（支持 `file://`）
 - 左侧输入 Markdown，右侧实时渲染为可交互思维导图
 - 支持二叉约束：每个节点最多两个子节点（左/右）
 
@@ -85,7 +85,7 @@ mindmap/
 
 ## 使用方式
 
-1. 双击打开 `mindmap.html`
+1. 双击打开 `index.html`（或 `mindmap.html`）
 2. 在左侧输入或粘贴 Markdown，点击“渲染”
 3. 或直接把 `.md` 文件拖入页面
 4. 首次拖入时，按提示选择保存 `*.modified` 文件（建议与原文件同目录）

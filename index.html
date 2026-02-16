@@ -1,0 +1,55 @@
+﻿<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MD -> Mindmap</title>
+  <link rel="stylesheet" href="styles/main.css" />
+</head>
+<body>
+<div class="app" id="app">
+  <div class="left" id="dropZone">
+    <div class="bar">
+      <strong>Markdown 输入</strong>
+      <span class="hint">支持标题、列表与缩进；子节点可用 [L]/[R] 标记左右；可拖入 .md 文件</span>
+    </div>
+    <textarea id="md"></textarea>
+    <div class="actions">
+      <button class="primary" id="renderBtn">渲染</button>
+      <button id="exampleBtn">载入示例</button>
+      <button id="clearBtn">清空</button>
+    </div>
+    <div class="tip">
+      操作：点击节点选中、点击角标折叠/展开、滚轮缩放、拖拽平移、<span class="kbd">R</span> 重置视图
+    </div>
+  </div>
+
+  <div class="right">
+    <div class="topRight">
+      <button id="resetViewBtn">重置视图</button>
+      <button id="exportBtn">导出 SVG</button>
+      <button id="exportMdBtn">导出 MD</button>
+      <button id="addLeftChildBtn">新增左子节点</button>
+      <button id="addRightChildBtn">新增右子节点</button>
+      <button id="editNodeBtn">编辑节点</button>
+      <button id="deleteNodeBtn">删除节点</button>
+    </div>
+    <div class="status" id="status">未渲染</div>
+    <svg id="svg" viewBox="-900 -200 1800 1400" xmlns="http://www.w3.org/2000/svg">
+      <g id="viewport"></g>
+    </svg>
+  </div>
+</div>
+
+<script src="src/config.js"></script>
+<script src="src/utils.js"></script>
+<script src="src/parser.js"></script>
+<script src="src/markdown.js"></script>
+<script src="src/layout.js"></script>
+<script src="src/renderer.js"></script>
+<script src="src/viewport.js"></script>
+<script src="src/export.js"></script>
+<script src="src/dragdrop.js"></script>
+<script src="src/app.js"></script>
+</body>
+</html>
