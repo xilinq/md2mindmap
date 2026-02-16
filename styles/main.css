@@ -139,6 +139,88 @@ button.primary:hover{border-color:var(--accent)}
   z-index:10;
 }
 
+.legend{
+  position:absolute;
+  right:10px;
+  bottom:10px;
+  z-index:10;
+  min-width:120px;
+  padding:8px 10px;
+  border:1px solid var(--stroke);
+  border-radius:12px;
+  background:linear-gradient(180deg,rgba(17,24,38,.85),rgba(12,18,28,.85));
+  backdrop-filter:blur(6px);
+  box-shadow:0 8px 20px rgba(0,0,0,.25);
+}
+
+.legendSummary{
+  list-style:none;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  cursor:pointer;
+  user-select:none;
+}
+
+.legendSummary::-webkit-details-marker{display:none}
+
+.legendTitle{
+  color:var(--text);
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:.2px;
+}
+
+.legendCaret{
+  color:var(--muted);
+  font-size:12px;
+  transform-origin:center;
+  transition:transform .18s ease;
+}
+
+.legend:not([open]) .legendCaret{
+  transform:rotate(-90deg);
+}
+
+.legendBody{
+  margin-top:6px;
+}
+
+.legendRow{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.legendRow + .legendRow{
+  margin-top:5px;
+}
+
+.legendDot{
+  width:10px;
+  height:10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.35);
+  box-shadow:0 0 10px rgba(0,0,0,.25);
+  flex:0 0 auto;
+}
+
+.legendDotLeft{
+  background:#32d74b;
+  box-shadow:0 0 10px rgba(50,215,75,.35);
+}
+
+.legendDotRight{
+  background:#ff453a;
+  box-shadow:0 0 10px rgba(255,69,58,.35);
+}
+
+.legendText{
+  color:var(--muted);
+  font-size:12px;
+}
+
 svg{
   width:100%;
   height:100%;
@@ -158,6 +240,9 @@ svg{
 .node:hover rect{fill:var(--nodeHover)}
 .node text{fill:var(--text);font-size:15.5px;dominant-baseline:middle}
 .node.selected rect{stroke:var(--accent);stroke-width:2}
+.sideDot{stroke:rgba(255,255,255,.35);stroke-width:1}
+.sideDotLeft{fill:#32d74b}
+.sideDotRight{fill:#ff453a}
 .badge{fill:rgba(74,163,255,.15);stroke:rgba(74,163,255,.45)}
 .badgeText{fill:var(--accent);font-size:12.5px}
 
@@ -168,4 +253,5 @@ svg{
 
 @media (max-width: 980px){
   .app{grid-template-columns:1fr;grid-template-rows:45vh 1fr}
+  .legend{right:8px;bottom:8px;padding:7px 9px;min-width:108px}
 }

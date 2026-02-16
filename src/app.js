@@ -530,6 +530,42 @@
     commitTreeChange(hit.container, 0);
   }
 
+  function setNodeSide(targetSide) {
+    const hit = requireSelection();
+    if (!hit || !hit.parent) {
+      return;
+    }
+
+    if (targetSide !== 'left' && targetSide !== 'right') {
+      return;
+    }
+
+    if (hit.parent.virtual) {
+      alert('根层节点不支持设置为左子或右子。');
+      return;
+    }
+
+    if (hit.node.side === targetSide) {
+      alert(`该节点已经是${targetSide === 'left' ? '左子节点' : '右子节点'}。`);
+      return;
+    }
+
+    const occupied = getChildBySide(hit.parent, targetSide);
+    if (occupied && occupied !== hit.node) {
+      const originalSide = hit.node.side;
+      if (originalSide !== 'left' && originalSide !== 'right') {
+        alert(`父节点的${targetSide === 'left' ? '左子节点' : '右子节点'}已存在，当前节点无法交换。`);
+        return;
+      }
+      occupied.side = originalSide;
+    }
+
+    hit.node.side = targetSide;
+    sortChildrenBySide(hit.parent);
+    selectedNodeId = hit.node.id;
+    commitTreeChange(hit.container, 0);
+  }
+
   function editNode() {
     const hit = requireSelection();
     if (!hit) {
@@ -586,6 +622,12 @@
   });
   $('addRightChildBtn').addEventListener('click', function () {
     addChildNode('right');
+  });
+  $('setAsLeftBtn').addEventListener('click', function () {
+    setNodeSide('left');
+  });
+  $('setAsRightBtn').addEventListener('click', function () {
+    setNodeSide('right');
   });
   $('editNodeBtn').addEventListener('click', editNode);
   $('deleteNodeBtn').addEventListener('click', deleteNode);

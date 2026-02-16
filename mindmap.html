@@ -33,10 +33,28 @@
       <button id="exportMdBtn">导出 MD</button>
       <button id="addLeftChildBtn">新增左子节点</button>
       <button id="addRightChildBtn">新增右子节点</button>
+      <button id="setAsLeftBtn">设为左子</button>
+      <button id="setAsRightBtn">设为右子</button>
       <button id="editNodeBtn">编辑节点</button>
       <button id="deleteNodeBtn">删除节点</button>
     </div>
     <div class="status" id="status">未渲染</div>
+    <details class="legend" aria-label="节点左右子节点图例" open>
+      <summary class="legendSummary">
+        <span class="legendTitle">图例</span>
+        <span class="legendCaret">▾</span>
+      </summary>
+      <div class="legendBody">
+        <div class="legendRow">
+          <span class="legendDot legendDotLeft"></span>
+          <span class="legendText">左子节点</span>
+        </div>
+        <div class="legendRow">
+          <span class="legendDot legendDotRight"></span>
+          <span class="legendText">右子节点</span>
+        </div>
+      </div>
+    </details>
     <svg id="svg" viewBox="-900 -200 1800 1400" xmlns="http://www.w3.org/2000/svg">
       <g id="viewport"></g>
     </svg>

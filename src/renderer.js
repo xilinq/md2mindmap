@@ -71,6 +71,15 @@
         g.appendChild(rect);
         g.appendChild(text);
 
+        if (node.side === 'left' || node.side === 'right') {
+          const sideDot = createSvgEl('circle');
+          sideDot.setAttribute('class', node.side === 'left' ? 'sideDot sideDotLeft' : 'sideDot sideDotRight');
+          sideDot.setAttribute('r', '4.5');
+          sideDot.setAttribute('cx', String(-node.w / 2 + 10));
+          sideDot.setAttribute('cy', String(-node.h / 2 + 10));
+          g.appendChild(sideDot);
+        }
+
         if ((node.children?.length || 0) > 0) {
           const badgeW = cfg.badgeW;
           const badgeH = cfg.badgeH;
